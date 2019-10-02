@@ -3,9 +3,9 @@ import cv2
 imageOriginal = cv2.imread('ModeloGabarito\GabaritoTeste.png')
 resized_image = cv2.resize(imageOriginal, (800, 800))
 
-def cropImage(xCoord, yCoord, heightRect, widthRect):
+def cropImage(xCoord, yCoord, height, width):
     
-    crop = resized_image[yCoord:yCoord + heightRect, xCoord:xCoord + widthRect]
+    crop = resized_image[yCoord:yCoord + height, xCoord:xCoord + width]
     cv2.imshow('Image', crop)
     cv2.waitKey(0)
 
@@ -21,13 +21,11 @@ def multipleChoice():
     widthRect = 30
     
     for key in xVertexDict:
-    
         yCoordRect = 207
         xListCoord = xVertexDict[key]
         
         for i in range(10): # 10 questions
             for xCoordRect in xListCoord:
-                
                 cropImage(xCoordRect, yCoordRect, heightRect, widthRect)
                 
             yCoordRect = yCoordRect + 20 #Next Question
@@ -35,31 +33,33 @@ def multipleChoice():
 def RA():
 
     xVertexRA = [294, 333, 371, 409, 447, 485]
-    
     yCoordRA = 62
-    heightRect = 31
-    widthRect = 29
+    heightSquare = 31
+    widthSquare = 29
     
     for xCoordRA in xVertexRA:
-        
-        cropImage(xCoordRA, yCoordRA, heightRect, widthRect)
+        cropImage(xCoordRA, yCoordRA, heightSquare, widthSquare)
         
 def otherAnswers():
     
-    xVertexOthers = [129, 167, 205, 243, 280, 318]
-
-    heightRect = 31
-    widthRect = 29
-    yCoord = 443
+    xVertexDict = {
+        '31_Vertex_ABCDE' : [129, 167, 205, 243, 280, 318],
+        '36_Vertex_ABCDE' : [469, 507, 544, 582, 620, 658]
+    }
+    
+    heightSquare = 31
+    widthSquare = 29
+    
+    for key in xVertexDict:
+        yCoord = 443
+        xListCoord = xVertexDict[key]
         
-    for i in range(5): # 5 questions
-    
-        for xCoord in xVertexOthers:
+        for i in range(5): # 5 Questions
+            for xCoord in xListCoord:
+                cropImage(xCoord, yCoord, heightSquare, widthSquare)
                 
-            cropImage(xCoord, yCoord, heightRect, widthRect)
-                
-        yCoord = yCoord + 44 #Next Question
-    
-multipleChoice()
-RA()
-otherAnswers()
+            yCoord = yCoord + 44 #Next Question
+        
+#multipleChoice()
+#RA()
+#otherAnswers()
