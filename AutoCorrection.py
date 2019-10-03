@@ -10,7 +10,7 @@ maskImage = np.zeros(resized_image.shape, np.uint8)
 maskAux = deepcopy(maskImage)
 
 
-def cropImage(xCoord, yCoord, height, width,):
+def cropImage(xCoord, yCoord, height, width):
     
     global resized_image
     crop = resized_image[yCoord:yCoord + height, xCoord:xCoord + width]
