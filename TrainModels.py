@@ -42,44 +42,68 @@ def downloadFiles():
             'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-nine.png'
             ]
     
+    print('Download files...')
     for url in urlsDownload:
         nameFile = url.split('/')[-1]
         if (os.path.exists(nameFile) == False):
             download_file(url)
+    print('-Finish download-')
+
+def load_data(path):
+
+    with np.load(path) as f:
+        x_train, y_train = f['x_train'], f['y_train']
+        x_test, y_test = f['x_test'], f['y_test']
+
+        x_train = x_train.reshape(x_train.shape[0], 1, 28, 28).astype('float32')
+
+        x_test = x_test.reshape(x_test.shape[0], 1, 28, 28).astype('float32')
+
+        x_train = x_train / 255
+        x_test = x_test / 255
+
+        y_train = np_utils.to_categorical(y_train)
+        y_test = np_utils.to_categorical(y_test)
+
+    return x_train, y_train, x_test, y_test
 
 def tests(model):
+
     images = ['number-one.png', 'number-two.png', 'number-three.png', 'number-four.png', 'number-five.png',
               'number-six.png', 'number-seven.png', 'number-eight.png', 'number-nine.png'
               ]
 
     for image in images:
-      img_pred = cv2.imread(image, 0)
-      plt.imshow(img_pred, cmap='gray')
-      plt.show()
+        img_pred = cv2.imread(image, 0)
+        plt.imshow(img_pred, cmap='gray')
     
-      if img_pred.shape != [28,28]:
-          img2 = cv2.resize(img_pred, (28, 28))
-          img_pred = img2.reshape(28, 28, -1)
-      else:
-          img_pred = img_pred.reshape(28, 28, -1)
+        if img_pred.shape != [28,28]:
+            img2 = cv2.resize(img_pred, (28, 28))
+            img_pred = img2.reshape(28, 28, -1)
+        else:
+            img_pred = img_pred.reshape(28, 28, -1)
     
-      img_pred = ~img_pred
-      img_pred = img_pred.reshape(1, 1, 28, 28).astype('float32')
+        img_pred = ~img_pred
+        img_pred = img_pred.reshape(1, 1, 28, 28).astype('float32')
     
-      img_pred = img_pred/255.0
+        img_pred = img_pred/255.0
     
     
-      pred = model.predict_classes(img_pred)
-      pred_proba = model.predict_proba(img_pred)
-      pred_proba = "%.2f%%" % (pred_proba[0][pred]*100)
-      print(pred[0], " com confiança de ", pred_proba)
-
+        pred = model.predict_classes(img_pred)
+        pred_proba = model.predict_proba(img_pred)
+        pred_proba = "%.2f%%" % (pred_proba[0][pred]*100)
+        print(pred[0], " com confiança de ", pred_proba)
+        plt.show()
 
 class loadModel:
     def __init__(self, name):
         self.name = name
         self.model = Model()
         self.model.load_weights(name)
+
+    def printAcc(self):
+        scores = self.model.evaluate(x_test, y_test, verbose=0)
+        print("\nAcc: %.2f%%" % (scores[1]*100))
     
     def testModel(self):
         tests(self.model)
@@ -92,7 +116,7 @@ class createModel:
         self.nameCallback = nameCallback
         self.patienceCallback = patienceCallback
     
-    def get_callbacks(name, patience_lr):
+    def get_callbacks(self, name, patience_lr):
         mcp_save = ModelCheckpoint(name+".h5", save_best_only=True,
                                          monitor='val_accuracy', mode='max')
         reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.1,
@@ -103,30 +127,11 @@ class createModel:
                                    verbose=0, mode='max', baseline=None)
         csv_logger = CSVLogger(name + '_log.csv', append=True, separator=';')
         return [reduce_lr_loss, early_stop, csv_logger, mcp_save]
-    
-    def load_data(path):
-        with np.load(path) as f:
-            x_train, y_train = f['x_train'], f['y_train']
-            x_test, y_test = f['x_test'], f['y_test']
-    
-        x_train = x_train.reshape(x_train.shape[0], 1, 28, 28).astype('float32')
         
-        x_test = x_test.reshape(x_test.shape[0], 1, 28, 28).astype('float32')
-        
-        x_train = x_train / 255
-        x_test = x_test / 255
-    
-        y_train = np_utils.to_categorical(y_train)
-        y_test = np_utils.to_categorical(y_test)
-        
-        return x_train, y_train, x_test, y_test
-    
     def trainModel(self):
         model = Model()
         model.summary()
-        
-        x_train, y_train, x_test, y_test = self.load_data('classicMnist.npz')
-        
+                
         model.fit(x_train, y_train, validation_data=(x_test, y_test),
                   epochs= self.epochs, batch_size = self.batch_size,
                   callbacks = self.get_callbacks(self.nameCallback, self.patienceCallback))
@@ -164,13 +169,15 @@ def Model():
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' #INFO, WARNING, and ERROR messages are not printed
 np.random.seed(2019)
-
 downloadFiles()
 
+x_train, y_train, x_test, y_test = load_data('classicMnist.npz')
+
 #create and train model
-#brain = createModel(name = 'Brain.h5', epochs = 1000, batch_size = 32, nameCallback = 'Albelis', patienceCallback = 10)
-#brain.trainModel()
+brain = createModel(name = 'Brain.h5', epochs = 1, batch_size = 32, nameCallback = 'Albelis', patienceCallback = 10)
+brain.trainModel()
 
 #load model and tests
-brainLoad = loadModel(name = 'Brain_SGD_1024.h5')
-brainLoad.testModel()
+#brainLoad = loadModel(name = 'Brain_SGD_1024.h5')
+#brainLoad.testModel()
+#brainLoad.printAcc()
