@@ -46,7 +46,7 @@ def downloadFiles():
     
     print('Download files...')
     
-    if((os.path.isdir("files") == False):
+    if((os.path.isdir("files")) == False):
         os.mkdir('files')
     
     os.chdir('files')
@@ -106,7 +106,7 @@ def tests(model):
         print(pred[0], " com confiança de ", pred_proba)
         plt.show()
 
-class loadModel:
+class LoadModel:
     def __init__(self, name):
         self.name = name
         self.model = Model()
@@ -119,7 +119,7 @@ class loadModel:
     def testModel(self):
         tests(self.model)
 
-class createModel:
+class CreateModel:
     def __init__(self, name, epochs, batch_size, nameCallback, patienceCallback):
         self.name = name
         self.epochs = epochs
@@ -186,11 +186,11 @@ downloadFiles()
 x_train, y_train, x_test, y_test = load_data('files/MnistKeras.npz')
 
 #create and train model
-#brain = createModel(name = 'Brain.h5', epochs = 1000, batch_size = 32, nameCallback = 'Albelis', patienceCallback = 10)
+#brain = CreateModel(name = 'Brain.h5', epochs = 1000, batch_size = 32, nameCallback = 'Albelis', patienceCallback = 10)
 #brain.trainModel()
 #brain.testModel()
 
 #load model and tests
-brainLoad = loadModel(name = 'Brain_SGD_1024.h5')
+brainLoad = LoadModel(name = 'files/Brain_SGD_1024.h5')
 brainLoad.testModel()
-brainLoad.printAcc()
+#brainLoad.printAcc()
