@@ -15,6 +15,8 @@ import requests
 import cv2
 import os
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' #INFO, WARNING, and ERROR messages are not printed
+
 def download_file(url):
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter below
@@ -29,24 +31,33 @@ def download_file(url):
 def downloadFiles():
     
     urlsDownload = [
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/1024/Brain_SGD_1024.h5',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/trainNeuralNet/datasetsMnist/classicMnist.npz',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-one.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-two.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-three.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-four.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-five.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-six.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-seven.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-eight.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/neuralNetworks/imgsNumbers/number-nine.png'
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/models/1024/Brain_SGD_1024.h5',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/MnistKeras.npz',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-one.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-two.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-three.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-four.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-five.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-six.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-seven.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-eight.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-nine.png'
             ]
     
     print('Download files...')
+    
+    if((os.path.isdir("files") == False):
+        os.mkdir('files')
+    
+    os.chdir('files')
+        
     for url in urlsDownload:
         nameFile = url.split('/')[-1]
         if (os.path.exists(nameFile) == False):
             download_file(url)
+    
+    os.chdir("..")
+    
     print('-Finish download-')
 
 def load_data(path):
@@ -69,8 +80,8 @@ def load_data(path):
 
 def tests(model):
 
-    images = ['number-one.png', 'number-two.png', 'number-three.png', 'number-four.png', 'number-five.png',
-              'number-six.png', 'number-seven.png', 'number-eight.png', 'number-nine.png'
+    images = ['files/number-one.png', 'files/number-two.png', 'files/number-three.png', 'files/number-four.png', 'files/number-five.png',
+              'files/number-six.png', 'files/number-seven.png', 'files/number-eight.png', 'files/number-nine.png'
               ]
 
     for image in images:
@@ -115,6 +126,7 @@ class createModel:
         self.batch_size = batch_size
         self.nameCallback = nameCallback
         self.patienceCallback = patienceCallback
+        self.model = Model()
     
     def get_callbacks(self, name, patience_lr):
         mcp_save = ModelCheckpoint(name+".h5", save_best_only=True,
@@ -127,18 +139,20 @@ class createModel:
                                    verbose=0, mode='max', baseline=None)
         csv_logger = CSVLogger(name + '_log.csv', append=True, separator=';')
         return [reduce_lr_loss, early_stop, csv_logger, mcp_save]
+    
+    def testModel(self):
+        tests(self.model)
         
     def trainModel(self):
-        model = Model()
-        model.summary()
+        self.model.summary()
                 
-        model.fit(x_train, y_train, validation_data=(x_test, y_test),
+        self.model.fit(x_train, y_train, validation_data=(x_test, y_test),
                   epochs= self.epochs, batch_size = self.batch_size,
                   callbacks = self.get_callbacks(self.nameCallback, self.patienceCallback))
         
-        model.save_weights(self.name)
+        self.model.save_weights(self.name)
         
-        scores = model.evaluate(x_test, y_test, verbose=0)
+        scores = self.model.evaluate(x_test, y_test, verbose=0)
         print("\nAcc: %.2f%%" % (scores[1]*100))
         
 def Model():
@@ -167,17 +181,16 @@ def Model():
 
     return model
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' #INFO, WARNING, and ERROR messages are not printed
 np.random.seed(2019)
 downloadFiles()
-
-x_train, y_train, x_test, y_test = load_data('classicMnist.npz')
+x_train, y_train, x_test, y_test = load_data('files/MnistKeras.npz')
 
 #create and train model
-brain = createModel(name = 'Brain.h5', epochs = 1, batch_size = 32, nameCallback = 'Albelis', patienceCallback = 10)
-brain.trainModel()
+#brain = createModel(name = 'Brain.h5', epochs = 1000, batch_size = 32, nameCallback = 'Albelis', patienceCallback = 10)
+#brain.trainModel()
+#brain.testModel()
 
 #load model and tests
-#brainLoad = loadModel(name = 'Brain_SGD_1024.h5')
-#brainLoad.testModel()
-#brainLoad.printAcc()
+brainLoad = loadModel(name = 'Brain_SGD_1024.h5')
+brainLoad.testModel()
+brainLoad.printAcc()
