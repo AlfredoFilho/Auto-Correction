@@ -1,14 +1,43 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import cv2
+import os
+import requests
 import numpy as np
 from copy import deepcopy
 
-imageOriginal = cv2.imread('modelosGabarito\GabaritoTeste.png')
-resized_image = cv2.resize(imageOriginal, (800, 800))
-maskImage = np.zeros(resized_image.shape, np.uint8)
-maskAux = deepcopy(maskImage)
+def download_file(url):
+    local_filename = url.split('/')[-1]
+    # NOTE the stream=True parameter below
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192): 
+                if chunk: # filter out keep-alive new chunks
+                    f.write(chunk)
+                    # f.flush()
 
+def downloadFiles():
+    
+    urlsDownload = [
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/testsTemplates/GabaritoPNG.png',
+            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/testsTemplates/GabaritoTeste.png']
+    
+    print('Download files...')
+    
+    if((os.path.isdir("files")) == False):
+        os.mkdir('files')
+    
+    os.chdir('files')
+        
+    for url in urlsDownload:
+        nameFile = url.split('/')[-1]
+        if (os.path.exists(nameFile) == False):
+            download_file(url)
+    
+    os.chdir("..")
+    
+    print('-Finish download-')
 
 def cropImage(xCoord, yCoord, height, width):
     
@@ -43,9 +72,10 @@ def multipleChoice():
             for xCoordRect in xListCoord:
                 mask(xCoordRect, yCoordRect, heightRect, widthRect)
 
-            cv2.imshow('Image', maskImage)
-            cv2.waitKey(0)
+                cv2.imshow('Image', maskImage)
+                cv2.waitKey(0)
             yCoordRect = yCoordRect + 20  # Next Question
+    cv2.destroyAllWindows()
 
 
 def RA():
@@ -56,11 +86,14 @@ def RA():
     heightSquare = 31
     xVertexRA = [294, 333, 371, 409, 447, 485]
 
+    maskImage = deepcopy(maskAux)
+
     for xCoordRA in xVertexRA:
         mask(xCoordRA, yCoordRA, heightSquare, widthSquare)
 
-    cv2.imshow('Image', maskImage)
-    cv2.waitKey(0)
+        cv2.imshow('Image', maskImage)
+        cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 def otherAnswers():
@@ -81,10 +114,18 @@ def otherAnswers():
             for xCoord in xListCoord:
                 mask(xCoord, yCoord, heightSquare, widthSquare)
 
-            cv2.imshow('Image', maskImage)
-            cv2.waitKey(0)
+                cv2.imshow('Image', maskImage)
+                cv2.waitKey(0)
             yCoord = yCoord + 44  # Next Question
+            
+    cv2.destroyAllWindows()
 
+downloadFiles()
+
+imageOriginal = cv2.imread('files/GabaritoTeste.png')
+resized_image = cv2.resize(imageOriginal, (800, 800))
+maskImage = np.zeros(resized_image.shape, np.uint8)
+maskAux = deepcopy(maskImage)
 
 multipleChoice()
 RA()
