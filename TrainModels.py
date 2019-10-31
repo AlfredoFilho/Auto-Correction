@@ -174,8 +174,8 @@ class Model:
         return model
 
 brain = Model()
-brain.loadModel('files/Brain_SGD_1024.h5')
-#brain.defineTrain(name = 'Brain.h5', epochs = 1000, batch_size = 32, nameCallback = 'BrainCallback', patienceCallback = 10)
-#brain.trainModel()
+#brain.loadModel('Brain.h5')
+brain.defineTrain(name = 'Brain.h5', epochs = 1000, batch_size = 32, nameCallback = 'BrainCallback', patienceCallback = 10)
+brain.trainModel()
 brain.testModel()
 brain.printAcc()
