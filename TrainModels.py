@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, CSVLogger
-from tensorflow.python.util import deprecation
+from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import MaxPooling2D
 from keras.layers.convolutional import Conv2D
 from keras.layers import GlobalMaxPooling2D
@@ -11,6 +11,7 @@ from keras.layers import Flatten
 from keras.utils import np_utils
 from keras.layers import Dense
 from keras import backend as K
+import keras
 import numpy as np
 import requests
 import cv2
@@ -155,21 +156,27 @@ class Model:
         model.add(MaxPooling2D(pool_size = (2, 2)))
         model.add(Dropout(0.2))
 
+        model.add(BatchNormalization())
+
         model.add(Conv2D(256, (3, 3), input_shape=(1, 28, 28), activation = 'relu'))
         model.add(MaxPooling2D(pool_size = (2, 2)))
         model.add(Dropout(0.2))
+
+        model.add(BatchNormalization())
     
         model.add(Conv2D(512, (3, 3), input_shape=(1, 28, 28), activation = 'relu'))
         model.add(MaxPooling2D(pool_size = (2, 2)))
         model.add(Dropout(0.3))
-            
+
+        model.add(BatchNormalization())            
         model.add(GlobalMaxPooling2D())
         
         model.add(Dense(1024, activation='relu'))
+        model.add(BatchNormalization())
         model.add(Dropout(0.5))
         model.add(Dense(num_classes, activation='softmax', name='predict'))
     
-        model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer = keras.optimizers.RMSprop(), metrics=['accuracy'])
     
         return model
 
