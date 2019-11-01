@@ -7,10 +7,9 @@ from keras.layers import GlobalMaxPooling2D
 from matplotlib import pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dropout
-from keras.layers import Flatten
+from keras.optimizers import RMSprop
 from keras.utils import np_utils
 from keras.layers import Dense
-from keras import backend as K
 import keras
 import numpy as np
 import requests
@@ -31,7 +30,6 @@ def download_file(url):
 def downloadFiles():
     
     urlsDownload = [
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/models/1024/Brain_SGD_1024.h5',
             'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/MnistKeras.npz',
             'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-one.png',
             'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-two.png',
@@ -44,7 +42,7 @@ def downloadFiles():
             'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/filesDownload/myNumbers/number-nine.png'
             ]
     
-    print('Download files...')
+    print('\nDownload files...')
     
     if((os.path.isdir("files")) == False):
         os.mkdir('files')
@@ -58,7 +56,7 @@ def downloadFiles():
     
     os.chdir("..")
     
-    print('-Finish download-')
+    print('...Finish download\n')
 
 def load_data(path):
 
@@ -150,22 +148,23 @@ class Model:
     def getModel(self):
 
         num_classes = 10
+        optimizer = RMSprop(lr = 0.001, rho = 0.9, epsilon = 1e-08, decay = 0.0)
         model = Sequential()
 
-        model.add(Conv2D(128, (5, 5), input_shape = (28, 28, 1), activation = 'relu'))
-        model.add(MaxPooling2D(pool_size = (2, 2)))
+        model.add(Conv2D(128, (3, 3), input_shape = (28, 28, 1), activation = 'relu', padding = 'same'))
+        model.add(MaxPooling2D(pool_size = (2, 2), strides = 2))
         model.add(Dropout(0.2))
 
         model.add(BatchNormalization())
 
-        model.add(Conv2D(256, (3, 3), input_shape=(1, 28, 28), activation = 'relu'))
-        model.add(MaxPooling2D(pool_size = (2, 2)))
+        model.add(Conv2D(256, (3, 3), input_shape=(1, 28, 28), activation = 'relu', padding = 'same'))
+        model.add(MaxPooling2D(pool_size = (2, 2), strides = 2))
         model.add(Dropout(0.2))
 
         model.add(BatchNormalization())
     
-        model.add(Conv2D(512, (3, 3), input_shape=(1, 28, 28), activation = 'relu'))
-        model.add(MaxPooling2D(pool_size = (2, 2)))
+        model.add(Conv2D(512, (3, 3), input_shape=(1, 28, 28), activation = 'relu', padding = 'same'))
+        model.add(MaxPooling2D(pool_size = (2, 2), strides = 2))
         model.add(Dropout(0.3))
 
         model.add(BatchNormalization())            
@@ -176,13 +175,13 @@ class Model:
         model.add(Dropout(0.5))
         model.add(Dense(num_classes, activation='softmax', name='predict'))
     
-        model.compile(loss='categorical_crossentropy', optimizer = keras.optimizers.RMSprop(), metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer = optimizer, metrics=['accuracy'])
     
         return model
 
 brain = Model()
-#brain.loadModel('Brain.h5')
-brain.defineTrain(name = 'Brain.h5', epochs = 1000, batch_size = 32, nameCallback = 'BrainCallback', patienceCallback = 10)
+#brain.loadModel('BrainRMSPropMin.h5')
+brain.defineTrain(name = 'BrainRMSPropMin.h5', epochs = 1000, batch_size = 128, nameCallback = 'BrainCallback', patienceCallback = 10)
 brain.trainModel()
 brain.testModel()
 brain.printAcc()
