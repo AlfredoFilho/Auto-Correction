@@ -47,16 +47,32 @@ def cutRect(bigRect, xCoord, yCoord, height, width):
 
 def getRects(bigRect):
     
-    Y = 40
-    widthRect = 30
-    heightRect = 30
-    List_Vertex_X = [61, 98, 135, 172, 209, 249, 285, 323, 361, 399, 438, 474, 512]
+    
+    widthRect = 27
+    heightRect = 27
+    List_Vertex_X = [61, 98, 135, 172, 211, 249, 285, 323, 361, 399, 438, 474, 512, 551, 590]
+    List_Coord_Y = [40, 88, 133, 178, 223]
     
     listRects = []
     
-    for X in List_Vertex_X:
-        rect = cutRect(bigRect, X, Y, heightRect, widthRect)
-        listRects.append(rect)
+    contLinha = 1
+    
+    for Y in List_Coord_Y:
+        
+        print('Linha: ' + str(contLinha))
+        contLinha = contLinha + 1
+        
+        for X in List_Vertex_X:
+            rect = cutRect(bigRect, X, Y, heightRect, widthRect)
+            listRects.append(rect)
+            
+            
+            
+            rectResize = cv2.resize(rect, (300, 300))
+            cv2.imshow('Rect', rectResize)
+            cv2.waitKey(0)
+            
+
     
     return listRects
     
@@ -66,7 +82,7 @@ bigRect = extractTemplateRectangle()
 listRects = []
 listRects = getRects(bigRect)
 
-
-for rect in listRects:
-    cv2.imshow('Rect', rect)
-    cv2.waitKey(0)
+#
+#for rect in listRects:
+#    cv2.imshow('Rect', rect)
+#    cv2.waitKey(0)
