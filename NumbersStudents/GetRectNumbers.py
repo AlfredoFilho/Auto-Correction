@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-modelo = cv2.imread('ModeloPNG.png')
+modelo = cv2.imread('ModeloPNGTeste.png')
 
 def findContours():
     
@@ -37,7 +37,36 @@ def extractTemplateRectangle():
 
     bigRect = cutImage(polygonExternalPoints)
     return bigRect
+
+
+def cutRect(bigRect, xCoord, yCoord, height, width):
+    
+    rect = bigRect[yCoord:yCoord + height, xCoord:xCoord + width]
+    return rect
+
+
+def getRects(bigRect):
+    
+    Y = 40
+    widthRect = 30
+    heightRect = 30
+    List_Vertex_X = [61, 98, 135, 172, 209, 249, 285, 323, 361, 399, 438, 474, 512]
+    
+    listRects = []
+    
+    for X in List_Vertex_X:
+        rect = cutRect(bigRect, X, Y, heightRect, widthRect)
+        listRects.append(rect)
+    
+    return listRects
+    
     
 bigRect = extractTemplateRectangle()
-cv2.imshow('Modelo', bigRect)
-cv2.waitKey(0)
+
+listRects = []
+listRects = getRects(bigRect)
+
+
+for rect in listRects:
+    cv2.imshow('Rect', rect)
+    cv2.waitKey(0)
