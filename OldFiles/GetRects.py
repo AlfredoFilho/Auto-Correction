@@ -6,39 +6,6 @@ import requests
 import numpy as np
 from copy import deepcopy
 
-def download_file(url):
-    local_filename = url.split('/')[-1]
-    # NOTE the stream=True parameter below
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        with open(local_filename, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192): 
-                if chunk: # filter out keep-alive new chunks
-                    f.write(chunk)
-                    # f.flush()
-
-def downloadFiles():
-    
-    urlsDownload = [
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/testsTemplates/GabaritoPNG.png',
-            'https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/testsTemplates/GabaritoTeste.png']
-    
-    print('Download files...')
-    
-    if((os.path.isdir("files")) == False):
-        os.mkdir('files')
-    
-    os.chdir('files')
-        
-    for url in urlsDownload:
-        nameFile = url.split('/')[-1]
-        if (os.path.exists(nameFile) == False):
-            download_file(url)
-    
-    os.chdir("..")
-    
-    print('-Finish download-')
-
 def cropImage(xCoord, yCoord, height, width):
     
     global resized_image
@@ -100,7 +67,7 @@ def otherAnswers():
 
     global maskImage, maskAux
     xVertexDict = {'31_Vertex_ABCDE': [129, 167, 205, 243, 280, 318],
-                   '36_Vertex_ABCDE': [ 469, 507, 544, 582, 620, 658]}
+                   '36_Vertex_ABCDE': [469, 507, 544, 582, 620, 658]}
 
     widthSquare = 29
     heightSquare = 31
@@ -120,9 +87,7 @@ def otherAnswers():
             
     cv2.destroyAllWindows()
 
-downloadFiles()
-
-imageOriginal = cv2.imread('files/GabaritoTeste.png')
+imageOriginal = cv2.imread('TemplateTeste_v1.png')
 resized_image = cv2.resize(imageOriginal, (800, 800))
 maskImage = np.zeros(resized_image.shape, np.uint8)
 maskAux = deepcopy(maskImage)
