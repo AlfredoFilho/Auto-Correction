@@ -45,12 +45,11 @@ def cutRect(bigRect, xCoord, yCoord, height, width):
 
 def getRects(bigRect):
     
-    widthRect = 27
-    heightRect = 27
-    List_Vertex_X = [61, 98, 135, 172, 211, 249, 285, 323, 361, 399, 438, 474, 512, 551, 590]
-    List_Coord_Y = [40, 88, 133, 178, 223, 268, 313, 358, 403, 448,
-                    493, 538, 583, 628, 673, 718, 763, 808, 853, 899]
-    
+    widthRect = 34
+    heightRect = 35
+    List_Vertex_X = [57, 95, 133, 171, 208, 246, 284, 322, 360, 397, 435, 473, 511, 549, 587]
+    List_Coord_Y = [38, 83, 129, 174, 219, 264, 310, 355, 400, 445, 491, 536, 581, 627, 672, 717, 763, 808, 853, 899]
+        
     listRects = []
     
     for Y in List_Coord_Y:
@@ -66,8 +65,9 @@ listRects = []
 
 listRects = getRects(bigRect)
 
-#for rect in enumerate(listRects):
+#for rect in listRects:
 #   
-#    cv2.imshow('Rect', rect)
+#    imS = cv2.resize(rect, (500, 500))
+#    cv2.imshow('Rect', imS)
 #    cv2.waitKey(0)
 #    cv2.destroyAllWindows()
