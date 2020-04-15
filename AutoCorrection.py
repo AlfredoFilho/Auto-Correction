@@ -1,3 +1,9 @@
+import os
+import sys
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
+import keras
+sys.stderr = stderr
 import cv2
 import json
 import argparse
@@ -5,13 +11,18 @@ import numpy as np
 from pdf2image import convert_from_path
 from media.modules import image as processimage
 from media.modules import number as processnumber
+from media.modules import model as processmodel
 
+#hide some system prints
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+listSixPredictions = []
 
 class AutoCorrection:
 
 
     def __init__(self, pathToLoadData):
         self.pathToLoadData = pathToLoadData
+        self.model = processmodel.getModel()
         self.loadData()
 
         
@@ -51,23 +62,9 @@ class AutoCorrection:
         bigRect = processimage.getBigRect(image)
         
         #resolve
-        self.resolveRA(coordinatesJson, bigRect)
         self.resolveAlternatives(coordinatesJson, bigRect)
         self.resolveOthers(coordinatesJson, bigRect)
-
-
-    def resolveRA(self, coordinatesJson, image):
-
-        #dimensions of RA square
-        height = 31
-        width = 29
-
-        for square in coordinatesJson['RA']:
-            x = coordinatesJson['RA'][square][0]
-            y = coordinatesJson['RA'][square][1]
-
-            #crop image
-            croppedSquare = processimage.cropImage(x, y, width, height, image)
+        self.resolveRA(coordinatesJson, bigRect)
 
 
     def resolveAnternative(self, question, listFiveRect):
@@ -114,6 +111,40 @@ class AutoCorrection:
                     listFiveRect = []
 
 
+    def predictNumber(self, question, imageNumber):
+
+        global listSixPredictions
+
+        imageGray = cv2.cvtColor(imageNumber, cv2.COLOR_RGB2GRAY)
+        imageProcessed = processnumber.processNumber(imageGray)
+        imageReshape = processnumber.reshape(imageProcessed)
+
+        prediction, percentage = processmodel.predictNumber(self.model, imageReshape)
+        #print(prediction[0], " -> ", percentage)
+
+        listSixPredictions.append(prediction[0])
+        if len(listSixPredictions) == 6:
+            print('Alternativa ' + question +': ' + ''.join(str(s) for s in listSixPredictions))
+            print()
+            listSixPredictions = []
+        
+
+
+    def resolveRA(self, coordinatesJson, image):
+
+        #dimensions of RA square
+        height = 31
+        width = 29
+
+        for square in coordinatesJson['RA']:
+            x = coordinatesJson['RA'][square][0]
+            y = coordinatesJson['RA'][square][1]
+
+            #crop image
+            croppedSquare = processimage.cropImage(x, y, width, height, image)
+            self.predictNumber(question = 'RA', imageNumber = croppedSquare)
+
+
     def resolveOthers(self, coordinatesJson, image):
 
         #dimensions of OthersAnswers square
@@ -130,7 +161,7 @@ class AutoCorrection:
 
                 #crop image
                 croppedSquare = processimage.cropImage(x, y, width, height, image)
-
+                self.predictNumber(question = question, imageNumber = croppedSquare)
 
 #Define argument essential
 parser = argparse.ArgumentParser(description='Auto Corretion Tests - AlfredoFilho')

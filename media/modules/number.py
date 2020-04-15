@@ -12,13 +12,15 @@ def getBestShift(img):
 
     return shiftx,shifty
 
+
 def shift(img,sx,sy):
     rows,cols = img.shape
     M = np.float32([[1,0,sx],[0,1,sy]])
     shifted = cv2.warpAffine(img,M,(cols,rows))
     return shifted
 
-def processImage(image):
+
+def processNumber(image):
 
     gray = cv2.resize(255-image, (28, 28))
     # better black and white version
@@ -60,3 +62,12 @@ def processImage(image):
     gray = shifted
 
     return gray
+
+
+def reshape(image):
+
+    image = image.reshape(28, 28, -1)
+    image = image.reshape(1, 28, 28, 1).astype('float32')
+    image = image/255.0
+
+    return image
