@@ -1,0 +1,4 @@
+cv2
+scipy
+pdf2image
+matplotlib

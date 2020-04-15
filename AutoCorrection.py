@@ -1,20 +1,28 @@
 import cv2
 import json
+import argparse
 import numpy as np
 from pdf2image import convert_from_path
+from media.modules import image as processimage
+from media.modules import number as processnumber
 
-import sys
-sys.path.insert(1, 'Modules')
-import ProcessImage
-import ProcessNumber
 
 class AutoCorrection:
+
 
     def __init__(self, pathToLoadData):
         self.pathToLoadData = pathToLoadData
         self.loadData()
 
         
+    def readJson(self):
+		
+        with open('media/coordinates.json') as fileJson:
+            coordinatesJson = json.load(fileJson)
+		
+            return coordinatesJson
+
+
     def loadData(self):
 
         #read json for get coordinates
@@ -40,22 +48,12 @@ class AutoCorrection:
     def resolveTemplate(self, image, coordinatesJson):
 
         #get biggest reactangle
-        bigRect = ProcessImage.getBigRect(image)
+        bigRect = processimage.getBigRect(image)
         
         #resolve
         self.resolveRA(coordinatesJson, bigRect)
         self.resolveAlternatives(coordinatesJson, bigRect)
         self.resolveOthers(coordinatesJson, bigRect)
-
-
-    def readJson(self):
-		
-        coordinatesJson = {}
-
-        with open('coordinates.json') as fileJson:
-            coordinatesJson = json.load(fileJson)
-		
-        return coordinatesJson
 
 
     def resolveRA(self, coordinatesJson, image):
@@ -69,29 +67,22 @@ class AutoCorrection:
             y = coordinatesJson['RA'][square][1]
 
             #crop image
-            croppedSquare = ProcessImage.cropImage(x, y, width, height, image)
+            croppedSquare = processimage.cropImage(x, y, width, height, image)
 
 
     def resolveAnternative(self, question, listFiveRect):
 
-        answers = {
-				0 : "A",
-				1 : "B",
-				2 : "C",
-				3 : "D",
-				4 : "E"
-        }
-
-        listMedia = []
+        answers = { 0 : "A", 1 : "B", 2 : "C", 3 : "D", 4 : "E" }
+        listAverages = []
 
         for rect in listFiveRect:
             #obtain average of each alternative of the question
 			
             average = np.average(rect)
-            listMedia.append(average)
+            listAverages.append(average)
 
         #get position for minimal average (marked question has the lowest average)
-        answerMarked = listMedia.index(min(listMedia))
+        answerMarked = listAverages.index(min(listAverages))
 
         print(f'Alternativa {question}:', answers[answerMarked])
         if int(question) % 10 == 0:
@@ -114,7 +105,7 @@ class AutoCorrection:
                 x = coordinatesJson['Alternatives'][question][square][0]
                 y = coordinatesJson['Alternatives'][question][square][1]
 
-                croppedRect = ProcessImage.cropImage(x, y, width, height, image)
+                croppedRect = processimage.cropImage(x, y, width, height, image)
 				
                 listFiveRect.append(croppedRect)
 
@@ -138,10 +129,10 @@ class AutoCorrection:
                 y = coordinatesJson['Others'][question][square][1]
 
                 #crop image
-                croppedSquare = ProcessImage.cropImage(x, y, width, height, image)
+                croppedSquare = processimage.cropImage(x, y, width, height, image)
 
-import argparse
 
+#Define argument essential
 parser = argparse.ArgumentParser(description='Auto Corretion Tests - AlfredoFilho')
 parser.add_argument('-f','--file', help = 'Path to file. Example: path/to/file.pdf', required=True)
 args = vars(parser.parse_args())
