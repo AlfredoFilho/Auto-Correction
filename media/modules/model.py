@@ -2,7 +2,7 @@ from keras.models import model_from_json
 
 def getModel():
 
-    jsonFile = open('media/model.json', 'r')
+    jsonFile = open('media/brainModel.json', 'r')
     loadedJson = jsonFile.read()
     jsonFile.close()
     model = model_from_json(loadedJson)

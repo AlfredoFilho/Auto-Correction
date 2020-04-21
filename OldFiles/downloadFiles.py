@@ -25,7 +25,8 @@ urlsDownload = {
     'modules': [
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/__init__.py",
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/image.py",
-        "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/number.py"
+        "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/number.py",
+        "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/model.json"
     ]
 }
 
