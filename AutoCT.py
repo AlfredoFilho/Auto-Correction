@@ -120,11 +120,10 @@ class AutoCorrection:
         imageReshape = processnumber.reshape(imageProcessed)
 
         prediction, percentage = processmodel.predictNumber(self.model, imageReshape)
-        print(prediction[0], " -> ", percentage)
 
-        if question == '35':
-            processimage.showImage(imageNumber)
-            processimage.showImage(imageProcessed)
+        # print(prediction[0], " -> ", percentage)
+        # processimage.showImage(imageNumber)
+        # processimage.showImage(imageProcessed)
 
         listSixPredictions.append(prediction[0])
         if len(listSixPredictions) == 6:
