@@ -18,6 +18,7 @@ urlsDownload = {
     'main' : "https://raw.githubusercontent.com/AlfredoFilho/Auto-Correction-Tests/master/AutoCorrection.py",
     'media': [
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/brain.h5",
+        "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/brainModel.json",
         "https://raw.githubusercontent.com/AlfredoFilho/Auto-Correction-Tests/master/media/coordinates.json",
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/example.pdf",
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/example.png"
@@ -26,7 +27,7 @@ urlsDownload = {
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/__init__.py",
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/image.py",
         "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/number.py",
-        "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/model.json"
+        "https://github.com/AlfredoFilho/Auto-Correction-Tests/raw/master/media/modules/model.py"
     ]
 }
 

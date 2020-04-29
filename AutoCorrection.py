@@ -13,7 +13,7 @@ from media.modules import image as processimage
 from media.modules import number as processnumber
 from media.modules import model as processmodel
 
-#hide some system prints
+#hide some system outputs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 listSixPredictions = []
 
@@ -47,10 +47,10 @@ class AutoCorrection:
 
         elif self.pathToLoadData[-4:] == '.pdf':
             
-            imagesPDF = convert_from_path(self.pathToLoadData, 100)
+            imagesPDF = convert_from_path(self.pathToLoadData, 90)
             
             for image in imagesPDF:
-                self.resolveTemplate(imageLoad, coordinatesJson)
+                self.resolveTemplate(image, coordinatesJson)
                 
         else:
             return print('\nO caminho/arquivo não é aceito. Somente extensão PDF ou PNG.\nExemplo: caminho/para/arquivo.pdf\n')
@@ -120,7 +120,11 @@ class AutoCorrection:
         imageReshape = processnumber.reshape(imageProcessed)
 
         prediction, percentage = processmodel.predictNumber(self.model, imageReshape)
-        #print(prediction[0], " -> ", percentage)
+        print(prediction[0], " -> ", percentage)
+
+        if question == '35':
+            processimage.showImage(imageNumber)
+            processimage.showImage(imageProcessed)
 
         listSixPredictions.append(prediction[0])
         if len(listSixPredictions) == 6:
@@ -162,6 +166,7 @@ class AutoCorrection:
                 #crop image
                 croppedSquare = processimage.cropImage(x, y, width, height, image)
                 self.predictNumber(question = question, imageNumber = croppedSquare)
+
 
 #Define argument essential
 parser = argparse.ArgumentParser(description='Auto Corretion Tests - AlfredoFilho')
