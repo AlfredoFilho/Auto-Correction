@@ -1,3 +1,3 @@
 _In developing_
 
-[Website](https://alfredofilho.github.io/AutoCT-Web/)
+[Website](https://alfredofilho.github.io/AutoCT/)
