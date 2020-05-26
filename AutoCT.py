@@ -47,9 +47,10 @@ class AutoCorrection:
 
         elif self.pathToLoadData[-4:] == '.pdf':
             
-            imagesPDF = convert_from_path(self.pathToLoadData, 90)
+            imagesPDF = convert_from_path(self.pathToLoadData)
             
             for image in imagesPDF:
+                image = np.asarray(image)
                 self.resolveTemplate(image, coordinatesJson)
                 
         else:
@@ -62,7 +63,7 @@ class AutoCorrection:
         bigRect = processimage.getBigRect(image)
         
         #resolve
-        self.resolveAlternatives(coordinatesJson, bigRect)
+        # self.resolveAlternatives(coordinatesJson, bigRect)
         self.resolveOthers(coordinatesJson, bigRect)
         self.resolveRA(coordinatesJson, bigRect)
 
@@ -121,9 +122,10 @@ class AutoCorrection:
 
         prediction, percentage = processmodel.predictNumber(self.model, imageReshape)
 
+        # if(question == "31"):
         # print(prediction[0], " -> ", percentage)
         # processimage.showImage(imageNumber)
-        # processimage.showImage(imageProcessed)
+        processimage.showImage(imageProcessed)
 
         listSixPredictions.append(prediction[0])
         if len(listSixPredictions) == 6:
@@ -136,8 +138,8 @@ class AutoCorrection:
     def resolveRA(self, coordinatesJson, image):
 
         #dimensions of RA square
-        height = 31
-        width = 29
+        height = 29
+        width = 25
 
         for square in coordinatesJson['RA']:
             x = coordinatesJson['RA'][square][0]
@@ -151,8 +153,8 @@ class AutoCorrection:
     def resolveOthers(self, coordinatesJson, image):
 
         #dimensions of OthersAnswers square
-        height = 31
-        width = 29
+        height = 29
+        width = 25
 
         #Get OthersAnswers keys from JSON
         others = list(coordinatesJson['Others'].keys())

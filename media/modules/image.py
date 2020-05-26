@@ -3,9 +3,10 @@ import matplotlib.pyplot as plt
 
 
 def findContours(image):
-    
+
     img_gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     contours, hierarchy = cv2.findContours(~img_gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
     return contours
 
 
@@ -21,6 +22,8 @@ def getBigRect(imageLoad):
     x,y,w,h = cv2.boundingRect(polygonExternalPoints)
     bigRect = imageLoad[y:y+h, x:x+w]
     bigRect = cv2.resize(bigRect, (800, 1000))
+
+    showImage(bigRect)
 
     return bigRect
 
